@@ -1,8 +1,14 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { Database } from '../types/database';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl =
+  import.meta.env.VITE_SUPABASE_URL ||
+  (import.meta.env as unknown as Record<string, string>)['vite_supabase_url'] ||
+  '';
+const supabaseAnonKey =
+  import.meta.env.VITE_SUPABASE_ANON_KEY ||
+  (import.meta.env as unknown as Record<string, string>)['vite_supabase_anon_key'] ||
+  '';
 
 export const isSupabaseConfigured = (): boolean => {
   return (

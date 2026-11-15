@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Cloud, Key, Shield, ArrowRight, UploadCloud } from 'lucide-react';
+import { X, Cloud, Shield, ArrowRight, UploadCloud, User as UserIcon, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useFinance } from '../../context/FinanceContext';
 
@@ -9,17 +9,17 @@ export const AuthModal: React.FC = () => {
     closeAuthModal,
     isConfigured,
     user,
-    signInWithEmail,
-    signUpWithEmail,
+    username,
+    signInWithUsername,
+    signUpWithUsername,
     continueAsGuest,
   } = useAuth();
 
   const { migrateLocalToCloud } = useFinance();
 
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
-  const [email, setEmail] = useState('');
+  const [usernameInput, setUsernameInput] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -33,18 +33,21 @@ export const AuthModal: React.FC = () => {
     setLoading(true);
 
     if (mode === 'signin') {
-      const { error } = await signInWithEmail(email, password);
+      const { error } = await signInWithUsername(usernameInput, password);
       if (error) {
-        setErrorMsg(error.message || 'Gagal masuk. Periksa email dan password.');
+        setErrorMsg(error.message || 'Gagal masuk. Periksa username dan password.');
       } else {
         closeAuthModal();
       }
     } else {
-      const { error } = await signUpWithEmail(email, password, fullName);
+      const { error } = await signUpWithUsername(usernameInput, password);
       if (error) {
         setErrorMsg(error.message || 'Gagal mendaftar akun.');
       } else {
-        setSuccessMsg('Pendaftaran berhasil! Silakan periksa inbox email untuk konfirmasi.');
+        setSuccessMsg('Pendaftaran akun berhasil! Kamu sekarang sudah terhubung.');
+        setTimeout(() => {
+          closeAuthModal();
+        }, 1200);
       }
     }
     setLoading(false);
@@ -88,22 +91,11 @@ export const AuthModal: React.FC = () => {
           <div>
             <div className="alert-box info" style={{ marginBottom: '16px' }}>
               <div>
-                <b>Supabase Belum Dikonfigurasi di Environment</b>
+                <b>Supabase Belum Dikonfigurasi</b>
                 <p style={{ fontSize: '12px', marginTop: '4px' }}>
                   Aplikasi saat ini berjalan dalam <b>Mode Lokal (Offline)</b> menggunakan memori browser kamu.
                 </p>
               </div>
-            </div>
-
-            <div style={{ fontSize: '13.5px', lineHeight: 1.6, color: 'var(--text-muted)', marginBottom: '18px' }}>
-              Untuk mengaktifkan sinkronisasi cloud dan hosting di Vercel:
-              <ol style={{ paddingLeft: '20px', marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <li>Buka project Supabase kamu atau buat di <b>supabase.com</b>.</li>
-                <li>Jalankan file <b>supabase/schema.sql</b> di Supabase SQL Editor.</li>
-                <li>
-                  Salin <b>Project URL</b> dan <b>Anon Key</b> ke file <code>.env.local</code> (atau Environment Variables di Vercel).
-                </li>
-              </ol>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -119,7 +111,9 @@ export const AuthModal: React.FC = () => {
               <Shield size={18} color="var(--income)" style={{ flexShrink: 0 }} />
               <div>
                 <b>Kamu sudah terhubung ke Supabase</b>
-                <p style={{ fontSize: '12px', marginTop: '2px' }}>Email: {user.email}</p>
+                <p style={{ fontSize: '12px', marginTop: '2px' }}>
+                  Username: <strong style={{ color: 'var(--text-bright)' }}>@{username}</strong>
+                </p>
               </div>
             </div>
 
@@ -162,31 +156,27 @@ export const AuthModal: React.FC = () => {
               </button>
             </div>
 
-            {mode === 'signup' && (
-              <div className="form-group">
-                <label className="form-label">Nama Lengkap</label>
-                <input
-                  type="text"
-                  placeholder="Nama kamu"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                />
-              </div>
-            )}
-
             <div className="form-group">
-              <label className="form-label">Email</label>
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <UserIcon size={14} />
+                <span>Username</span>
+              </label>
               <input
-                type="email"
-                placeholder="nama@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="misal: farid"
+                value={usernameInput}
+                onChange={(e) => setUsernameInput(e.target.value)}
+                autoCapitalize="none"
+                autoCorrect="off"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label className="form-label">Password</label>
+              <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Lock size={14} />
+                <span>Password</span>
+              </label>
               <input
                 type="password"
                 placeholder="Minimal 6 karakter"

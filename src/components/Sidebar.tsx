@@ -34,7 +34,7 @@ const MENU_ITEMS: { id: PageId; label: string; icon: React.ReactNode }[] = [
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { activePage, setActivePage } = useFinance();
-  const { user, isConfigured, isGuest, signOut, openAuthModal } = useAuth();
+  const { user, username, isConfigured, isGuest, signOut, openAuthModal } = useAuth();
 
   const handleSelectPage = (id: PageId) => {
     setActivePage(id);
@@ -99,7 +99,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
             {user ? (
               <div className="auth-user-info">
-                <div className="user-avatar">{user.email?.slice(0, 1).toUpperCase() || 'U'}</div>
+                <div className="user-avatar">{username.slice(0, 1).toUpperCase()}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
@@ -110,7 +110,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                       textOverflow: 'ellipsis',
                     }}
                   >
-                    {user.email}
+                    @{username}
                   </div>
                   <div style={{ fontSize: '10px', color: 'var(--text-dim)' }}>Terhubung ke Supabase</div>
                 </div>

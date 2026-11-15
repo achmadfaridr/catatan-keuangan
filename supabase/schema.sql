@@ -121,15 +121,25 @@ CREATE TRIGGER trigger_recurring_rules_updated_at
 -- ==============================================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+    v_username TEXT;
 BEGIN
-    -- Buat profil pengguna
+    v_username := COALESCE(
+        NEW.raw_user_meta_data->>'username',
+        NEW.raw_user_meta_data->>'full_name',
+        split_part(NEW.email, '@', 1)
+    );
+
+    -- Buat profil pengguna (hanya username/display_name, email diatur NULL)
     INSERT INTO public.profiles (id, email, display_name)
     VALUES (
         NEW.id,
-        NEW.email,
-        COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1))
+        NULL,
+        v_username
     )
-    ON CONFLICT (id) DO NOTHING;
+    ON CONFLICT (id) DO UPDATE
+    SET display_name = EXCLUDED.display_name,
+        email = NULL;
 
     -- Inisialisasi default budget
     INSERT INTO public.budgets (user_id, total_limit, threshold_percent, carry_over_surplus, category_limits)
