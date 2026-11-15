@@ -1,4 +1,4 @@
-# 💰 Catatan Keuangan (Money Management App)
+ # 💰 Catatan Keuangan (Money Management App)
 
 Aplikasi manajemen keuangan modern, budgeting 50/30/20, pelacakan tabungan & investasi, kalender pengingat, dan otomatisasi bulanan yang dibangun dengan **React + TypeScript + Vite**, terintegrasi dengan **Supabase Database & Authentication (dengan Row Level Security)**, dan siap dideploy langsung ke **Vercel**.
   
